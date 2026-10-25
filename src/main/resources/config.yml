@@ -1,0 +1,126 @@
+# ==========================================================================
+# EasyDomaniNonTiSvegli - configurazione
+# Ricaricabile con /edn reload (ricarica anche mods.yml).
+# ==========================================================================
+
+# ---- Anti seed cracker -----------------------------------------------------
+# Sostituisce l'hashed seed inviato al client (JOIN_GAME e RESPAWN) con un
+# valore casuale, stabile per mondo finche' il server resta acceso.
+# Il client lo usa solo per lo "zoom" dei biomi: nessun effetto sul gameplay.
+antiSeedCracker:
+  enabled: true
+
+# ---- Brand detection -------------------------------------------------------
+# Allo staff (edn.notify) arriva brand + numero di canali di chi entra.
+brand:
+  notifyOnJoin: true
+  # false = niente messaggio se il brand e' "vanilla" e non ci sono mod rilevate.
+  notifyVanilla: false
+
+# ---- Mod detection ---------------------------------------------------------
+# Profili in mods.yml. Un profilo con policy BAN rilevato (brand, canale o
+# probe) fa partire il ban a scala; ALERT avvisa solo lo staff.
+modDetection:
+  enabled: true
+  # Attesa dopo il join prima di controllare brand/canali, avvisare lo staff
+  # e aprire il primo sign probe (il client deve aver finito di caricare).
+  joinDelayTicks: 20
+  probe:
+    enabled: true
+    # Timeout di un editor (min 20): deve coprire autoClose + ping.
+    timeoutTicks: 40
+    # L'editor si chiude da solo dopo questi tick (flash breve).
+    autoCloseTicks: 5
+    # Pausa tra due editor dello stesso player.
+    intervalTicks: 10
+    # Key testate per editor (1..3; la riga 4 e' la sentinella).
+    keysPerSign: 3
+    # Aperture massime dell'editor per sessione (0 = illimitate).
+    maxPerSession: 3
+    # Tentativi (1/s) se non c'e' un blocco libero vicino al player.
+    maxDeferrals: 5
+  # Pack probe: SOLO diagnostica, richiede debug: true, nessuna sanzione.
+  # Al join manda un resource pack aggiuntivo (non sostituisce quello del
+  # server, required=false: chi lo rifiuta non viene kickato) con la lang key
+  # edn.probe; a pack caricato il sign probe controlla se il client la traduce.
+  packProbe:
+    enabled: false
+    # Server HTTP interno (JDK). Porta occupata = solo questo probe disattivato.
+    bind: '0.0.0.0'
+    port: 8164
+    # URL base raggiungibile dai client (http/https), es. 'http://mc.example.net:8164'
+    publicUrl: ''
+    # Alternativa al server interno: URL completo del pack ospitato altrove.
+    # Il plugin scrive probe-pack.zip nella sua cartella (da caricare li') e
+    # richiede un value fisso.
+    externalUrl: ''
+    # Valore di edn.probe (A-Z a-z 0-9 _ . -, 4-60). Vuoto = casuale a ogni avvio/reload.
+    value: ''
+    # Key di mod sovrascritte dal pack (valore = <value>-a, -b, ...; max 26).
+    # La PRIMA e' testata come ctrl-ovr-translate e ctrl-ovr-keybind.
+    # Il pack parte solo a fine sign probe e viene tolto subito dopo.
+    overrideKeys:
+    - 'key.anubis.open_gui'
+  # Rotation probe: SOLO diagnostica (log [Rot] in console), nessuna sanzione.
+  # Solo client 1.21.11 nativi; esclusi Bedrock, veicoli, elytra, morti, spettatori, a letto.
+  # Rotazione assoluta a yaw+3600 (stessa direzione), poi LookAt verso dove il player gia' guarda:
+  # il vanilla riporta lo yaw in [-180,180), Anubis (anche a moduli spenti) no.
+  # Aspetta la fine di sign/pack probe; a fine probe lo yaw torna in [-180,180).
+  # Forzabile con /edn rotprobe <player> anche se disattivato.
+  rotationProbe:
+    enabled: false
+    # Attesa dopo il join (tick).
+    delayTicks: 200
+
+# ---- Punizioni (ban a scala) -----------------------------------------------
+# Contatore persistente nel database H2 (punishments.mv.db), gestibile con /edn punish.
+punishment:
+  enabled: true
+  # 1a sanzione, 2a, 3a... (oltre l'ultima si riusa l'ultima). Unita': s m h d w, "perm".
+  ladder:
+  - 10m
+  - 12h
+  - 3d
+  # Azzera il contatore se l'ultima sanzione e' piu' vecchia di questo (0 = mai).
+  resetAfter: '0'
+  # Comando console per il ban. Placeholder: %player% %uuid% %reason% %duration% %count% %mod%
+  # VUOTO ('') = ban interno di Bukkit (ban-list + kick).
+  banCommand: 'lban %player% %duration% %reason%'
+  # Token per %duration% quando lo scalino e' "perm".
+  banCommandPermanent: 'perm'
+  # Testo di %reason% (una riga, MiniMessage/& ignorati). Placeholder: {mod} {count} {duration}
+  banCommandReason: 'No fra non penso eh... Cheat Detection: {mod}'
+  source: EasyDomaniNonTiSvegli
+  # Comandi console subito dopo il ban. Placeholder: %player% %uuid% %duration% %count% %mod% %expires%
+  # "\n" diventa un a capo. [] = nessuno.
+  postBanCommands:
+  - 'lbans broadcast &5&lWARDENAC &8&l» &d%player% &fè stato scoperto dal &5&lWarden\n    &fPer utilizzo di &dCheats &7&oed è stato spedito nel Purgatorio'
+
+# ---- Honeypot --------------------------------------------------------------
+# Ai player sottoterra viene mostrato (SOLO a loro, via pacchetto) un minerale
+# finto dentro stone/deepslate murato su tutti i lati: senza x-ray non si vede.
+# Chi ci scava sopra genera solo un alert allo staff, nessuna sanzione.
+# Il blocco finto non esiste nel mondo reale.
+honeypot:
+  enabled: true
+  # Sottoterra = Y <= maxY e nessuna luce del cielo sulla testa.
+  maxY: 40
+  # Minerale finto in STONE e in DEEPSLATE.
+  baitBlock: DIAMOND_ORE
+  baitBlockDeepslate: DEEPSLATE_DIAMOND_ORE
+  # Bait attivi al massimo per player.
+  maxPerPlayer: 2
+  # Distanza orizzontale dal player (blocchi): un tunnel normale non lo tocca.
+  minRadius: 4
+  maxRadius: 10
+  # Dopo questo tempo il client riceve di nuovo il blocco vero.
+  ttlSeconds: 300
+  # Secondi minimi tra due bait per lo stesso player.
+  placeCooldownSeconds: 10
+  # Ogni quanti tick controllare i player (piazzamento + scadenze).
+  checkIntervalTicks: 20
+
+# true = log diagnostici in console (probe, seed, bait). Lascia false.
+debug: false
+
+# I messaggi sono in messages.yml

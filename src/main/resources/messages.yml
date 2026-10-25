@@ -1,0 +1,90 @@
+# ==========================================================================
+# EasyDomaniNonTiSvegli - messaggi (ricaricabili con /edn reload)
+# Formato: MiniMessage (<#rrggbb>, <gradient>, <bold>, <hover>) + codici & (&8, &l, ...).
+# Placeholder %nome%: i valori sono sempre testo puro (mai tag o codici &).
+# Per scrivere un "<" letterale usa "\<".
+# Palette: grigio #9a9a9a, testo #e8e8e8, ok #3ddc84, errore #e63946, accento #4ec5e8, warning #ff8c42.
+# ==========================================================================
+
+# Placeholder in tutti i messaggi (tranne ban-screen e acf): %prefix%
+prefix: "&8[<gradient:#ff1a1a:#aa0000><bold>ᴇᴅɴ</bold></gradient>&8]"
+
+# ---- Comandi ---------------------------------------------------------------
+reloaded: "%prefix% <#9a9a9a>» <#e8e8e8>Configurazione e mods.yml <#3ddc84>ricaricati<#e8e8e8>."
+db-error: "%prefix% <#9a9a9a>» <#e63946>Errore del database, dettagli in console."
+# %player%
+player-not-found: "%prefix% <#9a9a9a>» <#e63946>Giocatore non trovato: <#e8e8e8>%player%"
+# %player%
+probe-sent: "%prefix% <#9a9a9a>» <#e8e8e8>Sign probe inviato a <#4ec5e8>%player%<#e8e8e8>."
+# %player%
+probe-failed: "%prefix% <#9a9a9a>» <#e63946>Probe non avviato per <#e8e8e8>%player% <#9a9a9a>(già attivo, nessuna key o nessun blocco libero)"
+# %player%
+rotprobe-sent: "%prefix% <#9a9a9a>» <#e8e8e8>Rotation probe avviato su <#4ec5e8>%player%<#e8e8e8>, esito in console <#9a9a9a>([Rot])."
+# %player% %reason%
+rotprobe-failed: "%prefix% <#9a9a9a>» <#e63946>Rotation probe non avviato per <#e8e8e8>%player% <#9a9a9a>(%reason%)"
+# %player% %count% %mod% %next%
+punish-info: "%prefix% <#9a9a9a>» <#4ec5e8>%player%<#9a9a9a>: <#e8e8e8>sanzioni <#ff8c42>%count%<#9a9a9a>, <#e8e8e8>ultima mod <#ff8c42>%mod%<#9a9a9a>, <#e8e8e8>prossima durata <#ff8c42>%next%"
+# %player%
+punish-reset: "%prefix% <#9a9a9a>» <#e8e8e8>Contatore sanzioni di <#4ec5e8>%player% <#3ddc84>azzerato<#e8e8e8>."
+
+# ---- Alert allo staff (edn.notify) ----------------------------------------
+# %player% %brand% %channels%
+join-info: "&8[<#3ddc84>+&8] <#e8e8e8>%player%&8: <#3ddc84>%brand% <#9a9a9a>| <#e8e8e8>canali <#3ddc84>%channels%"
+# %player% %mod% %source%
+mod-detected: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha <#ff8c42>%mod% &8[<#ff8c42>%source%&8]"
+# %player% %duration% %count% %mod%
+ban: "%prefix% <#9a9a9a>» <#e63946>Ban <#e8e8e8>%player% <#9a9a9a>per <#ff8c42>%duration% &8[<#ff8c42>#%count%&8] <#9a9a9a>- <#e8e8e8>%mod%"
+# %player% %block% %x% %y% %z% %count%
+honeypot-hit: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha scavato un honeypot <#ff8c42>%block% &8[<#ff8c42>%x% %y% %z%&8] &8[<#ff8c42>#%count%&8]"
+
+# ---- /edn info -------------------------------------------------------------
+# %player% %brand% %count% %channels% %mods% %probe% %hits% %punishments%
+info:
+  - "<#4ec5e8>%player%<#e8e8e8>'s profile<#9a9a9a>:"
+  - "<#9a9a9a>☰ <#e8e8e8>Brand: <#4ec5e8>%brand%"
+  - "<#9a9a9a>☰ <#e8e8e8>Canali (%count%): <#4ec5e8>%channels%"
+  - "<#9a9a9a>☰ <#e8e8e8>Mod rilevate: <#ff8c42>%mods%"
+  - "<#9a9a9a>☰ <#e8e8e8>Probe: <#4ec5e8>%probe% <#9a9a9a>| <#e8e8e8>Honeypot hit: <#4ec5e8>%hits%"
+  - "<#9a9a9a>☰ <#e8e8e8>Sanzioni: <#4ec5e8>%punishments%"
+
+# ---- Ban interno (schermata di kick/ban-list) ---------------------------
+# %mod% %count% %duration% %expires%
+ban-screen: "<#e63946>Cheat client non consentito<#9a9a9a>: <#ff8c42>%mod%\n<#9a9a9a>Sanzione <#e8e8e8>#%count% <#9a9a9a>- durata <#e8e8e8>%duration% <#9a9a9a>(scade: <#e8e8e8>%expires%<#9a9a9a>)"
+
+# ---- /edn help -------------------------------------------------------------
+# header: %version% %page% %pages% | command/hover: %command% %syntax% %description% %permission%
+# footer e footer-more: %page% %pages% (mostrati solo se le pagine sono più di una)
+help:
+  header:
+    - ""
+    - " <gradient:#ff1a1a:#aa0000><bold>ᴇᴀѕʏᴅᴏᴍᴀɴɪɴᴏɴᴛɪѕᴠᴇɢʟɪ</bold></gradient> <#9a9a9a>v%version%"
+    - ""
+  command: "&8[<#3ddc84>➡&8] <#4ec5e8>/%command% <#e8e8e8>%syntax% <#9a9a9a>- <#e8e8e8>%description%"
+  footer: "<#9a9a9a>Pagina <#e8e8e8>%page%<#9a9a9a>/<#e8e8e8>%pages%"
+  footer-more: "<#e8e8e8>Usa <#4ec5e8>/edn help \\<pagina> <#e8e8e8>per le altre pagine."
+  hover:
+    - "<#4ec5e8>%description%"
+    - "<#9a9a9a>Sintassi: <#e8e8e8>/%command% %syntax%"
+    - "<#9a9a9a>Permesso: <#e8e8e8>%permission%"
+    - "<#ff8c42>Clicca per inserire"
+
+# ---- Errori di ACF (la libreria dei comandi) -------------------------------
+# Sovrascrivono i testi di default di ACF. Usano i {segnaposto} di ACF, non %nome%.
+# I messaggi di errore sugli argomenti sono avvolti da error-prefix, quindi senza prefisso proprio.
+acf:
+  error-prefix: "%prefix% <#9a9a9a>» <#e63946>{message}"
+  permission-denied: "%prefix% <#9a9a9a>» <#e63946>Non hai i permessi per eseguire questo comando."
+  permission-denied-parameter: "%prefix% <#9a9a9a>» <#e63946>Non hai i permessi per eseguire questo comando."
+  unknown-command: "%prefix% <#9a9a9a>» <#e63946>Comando sconosciuto, usa <#4ec5e8>/edn help"
+  invalid-syntax: "%prefix% <#9a9a9a>» <#e8e8e8>Uso: <#4ec5e8>{command} <#e8e8e8>{syntax}"
+  error-performing-command: "%prefix% <#9a9a9a>» <#e63946>Errore nell'esecuzione del comando."
+  error-generic-logged: "%prefix% <#9a9a9a>» <#e63946>Si è verificato un errore, dettagli in console."
+  must-be-a-number: "<#e8e8e8>{num} <#e63946>deve essere un numero."
+  not-allowed-on-console: "<#e63946>La console non può eseguire questo comando."
+  could-not-find-player: "<#e63946>Giocatore non trovato: <#e8e8e8>{search}"
+  no-player-found: "<#e63946>Giocatore non trovato: <#e8e8e8>{search}"
+  no-player-found-server: "<#e63946>Giocatore non connesso: <#e8e8e8>{search}"
+  no-player-found-offline: "<#e63946>Giocatore non trovato: <#e8e8e8>{search}"
+  multiple-players-match: "<#e63946>Più giocatori trovati per <#e8e8e8>{search} <#9a9a9a>({all})<#e63946>, sii più specifico."
+  username-too-short: "<#e63946>Username troppo corto, minimo 3 caratteri."
+  is-not-a-valid-name: "<#e8e8e8>{name} <#e63946>non è un username valido."

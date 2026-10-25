@@ -1,0 +1,23 @@
+name: EasyDomaniNonTiSvegli
+main: xyz.lorenzzzz.easydomani.EasyDomaniNonTiSvegli
+version: '${version}'
+api-version: '1.21'
+author: lorenzzzz
+description: Honeypot, anti seed cracker, brand e mod detection, Versione rifatta preso spunto da PolarAntiesp
+depend: [packetevents]
+# Scaricate da Maven Central dal library loader di Paper (non incluse nel jar)
+libraries:
+  - ${h2}
+  - ${hikari}
+  - ${caffeine}
+# Il comando /edn (alias easydomani) lo registra ACF a runtime.
+permissions:
+  edn.admin:
+    description: Accesso ai comandi /edn
+    default: op
+  edn.notify:
+    description: Riceve gli alert (brand, mod, honeypot, ban)
+    default: op
+  edn.bypass:
+    description: Esente da sign probe, honeypot e ban automatici
+    default: false

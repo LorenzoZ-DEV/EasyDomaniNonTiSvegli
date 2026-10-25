@@ -1,0 +1,131 @@
+# ==========================================================================
+# EasyDomaniNonTiSvegli - profili mod (ricaricabile con /edn reload)
+#
+# Ogni profilo:
+#   name:     nome mostrato allo staff
+#   policy:   BAN (ban a scala) | ALERT (solo avviso allo staff)
+#   brands:   exact: [...]    brand identico (case-insensitive)
+#             contains: [...] sottostringa del brand (case-insensitive)
+#   channels: prefissi dei plugin channel registrati (case-insensitive)
+#   probe:    sign probe con translation key
+#     key:      translation key inviata al client
+#     expected: traduzioni (lowercase) che danno MATCH; SOLO valori verificati
+#               sul file lang della mod
+#     bypass:   true = {"translate":"%s","with":[{"translate":key}]} per
+#               superare i mixin che filtrano le key note (es. Meteor)
+#     keybind:  true = invia {"keybind":key}: risolto dal registro KeyMapping del
+#               client, non dipende dalle lang (Lunar); MATCH = qualsiasi risposta
+#               diversa dalla key; `expected` non serve
+#     enabled:  false = key non verificata, probe non usato
+#
+# Ordine = priorita' del probe: prima i cheat (BAN), poi le minimap (ALERT).
+# ==========================================================================
+profiles:
+
+  meteor:
+    name: "Meteor Client"
+    policy: BAN
+    channels:
+    - "meteor-client:"
+    probe:
+      key: "key.category.meteor-client.meteor-client"
+      expected:
+      - "meteor client"
+      bypass: true
+
+  wurst:
+    name: "Wurst Client"
+    policy: BAN
+    channels:
+    - "wurst:"
+    probe:
+      key: "key.wurst.zoom"
+      expected:
+      - "zoom"
+
+  # Anubis Beta 0.9.9: nessun canale/brand custom, solo sign probe.
+  # AnubisClientMod: KeyBindingHelper.registerKeyBinding(new KeyMapping("key.anubis.open_gui", ..., 344 /* RIGHT_SHIFT */, ...))
+  # keybind: su Lunar le lang delle mod Fabric non vengono caricate, la translate tornava grezza.
+  anubis:
+    name: "Anubis"
+    policy: BAN
+    probe:
+      key: "key.anubis.open_gui"
+      keybind: true
+
+  # LiquidBounce: niente probe ne' canali (verificato sul sorgente, branch nextgen):
+  #  - le lang stanno in /resources/liquidbounce/lang/, fuori da assets/, quindi il
+  #    Language vanilla non le carica: una key dal server torna identica a vanilla;
+  #  - non registra alcun plugin channel.
+  # Lo si becca dal brand del suo ClientSpoofer: preset hardcoded "Lunar" (default)
+  # e "Cheatbreaker", stringhe che nessun client reale manda.
+  # NON aggiungere "geyser": e' il brand di ogni vero giocatore Bedrock.
+  liquidbounce:
+    name: "LiquidBounce"
+    policy: BAN
+    brands:
+      exact:
+      - "lunarclient:v2.21.33-2612"
+      - "CB"
+
+  # hashalite/Freecam: assets/freecam/lang/en_us.json
+  # Nel vecchio plugin non aveva profilo ne' era tra i profili puniti: mai
+  # bannato. Resta ALERT.
+  freecam:
+    name: "Freecam"
+    policy: ALERT
+    probe:
+      key: "key.freecam.toggle"
+      expected:
+      - "toggle freecam"
+
+  # it "Minimappa", es "Mini mapa", es_mx "Minimapa", fr "Mini-Carte",
+  # de moderno "Minimap", de legacy (1.7.10-1.8.9) "Minikarte".
+  xaero-minimap:
+    name: "Xaero's Minimap"
+    policy: ALERT
+    channels:
+    - "xaerominimap:"
+    probe:
+      key: "gui.xaero_minimap"
+      expected:
+      - "xaero's minimap"
+      - "xaero minimap"
+      - "minimap"
+      - "minimappa"
+      - "mini mapa"
+      - "minimapa"
+      - "mini-carte"
+      - "minikarte"
+
+  # Nessun locale it/es/de/fr nel jar: fallback en_us "World Map Waypoints".
+  xaero-worldmap:
+    name: "Xaero's World Map"
+    policy: ALERT
+    channels:
+    - "xaeroworldmap:"
+    probe:
+      key: "gui.xaero_worldmap_waypoints"
+      expected:
+      - "world map waypoints"
+      - "xaero's world map"
+      - "world map"
+
+  journeymap:
+    name: "JourneyMap"
+    policy: ALERT
+    channels:
+    - "journeymap:"
+    # Key non verificata: probe disabilitato.
+    probe:
+      key: "journeymap.fullmap.title"
+      expected:
+      - "journeymap"
+      - "journey map"
+      enabled: false
+
+  # OpSec (aurickk/OpSec) non ha profilo: verificato sul sorgente che brand,
+  # canali, known packs e risposte al probe sono identici a vanilla. Con i suoi
+  # default (whitelistMode AUTO) le mod con canale passano, quindi i probe di
+  # meteor/wurst/xaero continuano a funzionare; meteorFix rende anzi il probe
+  # di Meteor piu' affidabile.

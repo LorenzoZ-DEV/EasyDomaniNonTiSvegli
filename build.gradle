@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.6.1'
+}
+
+group = 'xyz.lorenzzzz'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url = 'https://repo.codemc.io/repository/maven-releases/' }
+    maven { url = 'https://repo.aikar.co/content/groups/aikar/' }
+}
+
+// Librerie caricate da Paper a runtime (plugin.yml -> libraries): stesse coordinate per Gradle e plugin.yml
+def h2Lib = 'com.h2database:h2:2.5.252'
+def hikariLib = 'com.zaxxer:HikariCP:7.1.0'
+def caffeineLib = 'com.github.ben-manes.caffeine:caffeine:3.3.1'
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    compileOnly 'com.github.retrooper:packetevents-spigot:2.14.0'
+    implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
+    // Scaricate a runtime dal library loader di Paper (plugin.yml -> libraries): non shadate
+    compileOnly h2Lib
+    compileOnly hikariLib
+    compileOnly caffeineLib
+
+    testImplementation 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+    testImplementation 'com.github.retrooper:packetevents-spigot:2.14.0'
+    testImplementation h2Lib
+    testImplementation hikariLib
+    testImplementation caffeineLib
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// I sorgenti Anubis e i jar in libs sono solo riferimento: non vanno compilati
+sourceSets {
+    main {
+        java {
+            exclude 'xyz/lorenzzzz/libs/**'
+        }
+    }
+}
+
+// ACF legge i nomi dei parametri via reflection
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-parameters']
+}
+
+// Versione e coordinate delle librerie finiscono in plugin.yml: un solo posto da aggiornare
+def pluginProps = [
+        version  : version.toString(),
+        h2       : h2Lib,
+        hikari   : hikariLib,
+        caffeine : caffeineLib,
+]
+processResources {
+    inputs.properties(pluginProps)
+    filesMatching('plugin.yml') {
+        expand(pluginProps)
+    }
+}
+
+// Un solo jar: quello shadato, senza classifier
+jar {
+    enabled = false
+}
+
+shadowJar {
+    archiveBaseName = 'EasyDomaniNonTiSvegli'
+    archiveClassifier = ''
+    relocate 'co.aikar.commands', 'xyz.lorenzzzz.easydomani.libs.acf'
+    relocate 'co.aikar.locales', 'xyz.lorenzzzz.easydomani.libs.locales'
+    exclude 'META-INF/maven/**'
+}
+
+assemble.dependsOn shadowJar
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,23 @@
+package net.anubis.client.module;
+
+import java.util.concurrent.atomic.AtomicLong;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+/* JADX INFO: loaded from: Anubis Beta 0.9.9.jar:net/anubis/client/module/ModuleRevision.class */
+@Environment(EnvType.CLIENT)
+public final class ModuleRevision {
+    private static final AtomicLong VALUE = new AtomicLong();
+    public static final Runnable CHANGED = ModuleRevision::changed;
+
+    private ModuleRevision() {
+    }
+
+    public static long current() {
+        return VALUE.get();
+    }
+
+    public static void changed() {
+        VALUE.incrementAndGet();
+    }
+}

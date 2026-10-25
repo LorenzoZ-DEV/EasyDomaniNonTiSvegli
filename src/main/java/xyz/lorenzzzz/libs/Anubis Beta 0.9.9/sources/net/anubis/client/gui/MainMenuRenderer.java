@@ -1,0 +1,95 @@
+package net.anubis.client.gui;
+
+import imgui.ImDrawList;
+import imgui.ImFont;
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import java.util.Objects;
+import net.anubis.client.gui.mainmenu.CommunityPopup;
+import net.anubis.client.gui.mainmenu.ConnectionsPanel;
+import net.anubis.client.gui.mainmenu.CreditsPopup;
+import net.anubis.client.gui.mainmenu.DuskMenu;
+import net.anubis.client.gui.mainmenu.MenuContext;
+import net.anubis.client.imgui.ImGuiManager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.class_310;
+import net.minecraft.class_437;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/* JADX INFO: loaded from: Anubis Beta 0.9.9.jar:net/anubis/client/gui/MainMenuRenderer.class */
+@Environment(EnvType.CLIENT)
+final class MainMenuRenderer {
+    private static final Logger LOGGER = LoggerFactory.getLogger("Anubis");
+    private static final float NOWHERE = -10000.0f;
+    private final MenuContext context;
+    private final CommunityPopup popup = new CommunityPopup();
+    private final ConnectionsPanel accounts = new ConnectionsPanel(() -> {
+    });
+    private final CreditsPopup credits = new CreditsPopup();
+    private long openedAt = System.nanoTime();
+    private boolean failed;
+
+    MainMenuRenderer(class_437 screen) {
+        Runnable runnable = () -> {
+            this.accounts.open(ConnectionsPanel.Tab.ACCOUNTS);
+        };
+        CreditsPopup creditsPopup = this.credits;
+        Objects.requireNonNull(creditsPopup);
+        this.context = new MenuContext(screen, runnable, creditsPopup::open);
+    }
+
+    boolean keyPressed(int key) {
+        return this.popup.keyPressed(key) || this.credits.keyPressed(key) || this.accounts.keyPressed(key);
+    }
+
+    void render() {
+        class_310 mc = class_310.method_1551();
+        long now = System.nanoTime();
+        if (mc.method_18506() != null) {
+            this.openedAt = now;
+        }
+        ImGuiIO io2 = ImGui.getIO();
+        boolean live = mc.method_18506() == null;
+        float t = (now - this.openedAt) / 1.0E9f;
+        float mx = io2.getMousePosX();
+        float my = io2.getMousePosY();
+        boolean click = live && ImGui.isMouseClicked(0);
+        float width = io2.getDisplaySizeX();
+        float height = io2.getDisplaySizeY();
+        float scale = ImGuiManager.getInstance().uiScale();
+        float dt = Math.max(0.001f, io2.getDeltaTime());
+        this.popup.update(t, live);
+        boolean menuPointer = (this.popup.isOpen() || this.accounts.isOpen() || this.credits.isOpen()) ? false : true;
+        this.context.begin(ImGui.getBackgroundDrawList(), ImGui.getForegroundDrawList(), width, height, scale, t, dt, menuPointer ? mx : NOWHERE, menuPointer ? my : NOWHERE, menuPointer && click);
+        try {
+            DuskMenu.render(this.context);
+            if (this.context.pendingTooltip() != null) {
+                drawTooltip(this.context);
+            }
+            this.accounts.render(width, height, scale, dt);
+            this.credits.render(ImGui.getForegroundDrawList(), width, height, scale, dt, mx, my, click);
+            this.popup.render(ImGui.getForegroundDrawList(), width, height, scale, dt, mx, my, click);
+        } catch (RuntimeException e) {
+            if (!this.failed) {
+                LOGGER.error("[Anubis] Main menu failed to render", e);
+            }
+            this.failed = true;
+        }
+    }
+
+    private static void drawTooltip(MenuContext c) {
+        ImDrawList dl = c.fg();
+        ImFont font = c.tagFont();
+        String text = c.pendingTooltip();
+        float size = c.textHeight(font);
+        float w = c.textWidth(font, text) + c.px(18.0f);
+        float h = size + c.px(9.0f);
+        float x = c.tooltipX() - (w * 0.5f);
+        float y = c.tooltipY();
+        dl.addRectFilled(x, y, x + w, y + h, MenuContext.col(-16053492, 0.96f), c.px(3.0f));
+        dl.addRect(x, y, x + w, y + h, MenuContext.col(-1, 0.25f), c.px(3.0f), 0, Math.max(1.0f, c.scale()));
+        c.text(dl, font, x + c.px(9.0f), y + c.px(4.5f), -921103, 1.0f, text);
+    }
+}
