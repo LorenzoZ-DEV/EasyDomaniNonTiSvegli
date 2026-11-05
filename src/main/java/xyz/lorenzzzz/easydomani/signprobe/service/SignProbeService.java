@@ -47,7 +47,7 @@ public final class SignProbeService {
     private volatile List<ModProfile> table = List.of();
     private volatile SignProbeSettings settings = SignProbeSettings.disabled();
 
-    private static final class Session {
+    static final class Session {
         final Deque<ModProfile> queue = new ArrayDeque<>();
         final Set<String> retried = new HashSet<>();
         int opened;
@@ -68,6 +68,13 @@ public final class SignProbeService {
 
         void retry(ModProfile def) {
             if (retried.add(def.id())) queue.addLast(def);
+        }
+
+        boolean abandonActive() {
+            ActiveSignProbe a = active;
+            if (a == null || !close(a)) return false;
+            for (ModProfile def : a.defs()) retry(def);
+            return true;
         }
     }
 
@@ -104,9 +111,9 @@ public final class SignProbeService {
         sessions.remove(uuid);
     }
 
-    public void abandonActive(UUID uuid) {
-        Session s = sessions.get(uuid);
-        if (s != null) s.active = null;
+    public void abandonActive(Player player) {
+        Session s = sessions.get(player.getUniqueId());
+        if (s != null && s.abandonActive()) scheduleNext(player, s);
     }
 
     public boolean awaitsSignUpdate(UUID uuid) {

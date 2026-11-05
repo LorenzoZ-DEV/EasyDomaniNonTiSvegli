@@ -21,6 +21,6 @@ public final class SignProbeListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldChange(PlayerChangedWorldEvent event) {
-        signProbe.abandonActive(event.getPlayer().getUniqueId());
+        signProbe.abandonActive(event.getPlayer());
     }
 }
