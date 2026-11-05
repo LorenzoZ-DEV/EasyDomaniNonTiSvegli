@@ -18,6 +18,7 @@ import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -293,8 +294,12 @@ public final class SignProbeService {
         for (int[] c : candidates) {
             if (c[1] < w.getMinHeight() || c[1] >= w.getMaxHeight()) continue;
             Block b = w.getBlockAt(c[0], c[1], c[2]);
-            if (!b.getType().isSolid()) return b;
+            if (isProbeSpot(b.getType())) return b;
         }
         return null;
+    }
+
+    static boolean isProbeSpot(Material type) {
+        return type == Material.AIR || type == Material.CAVE_AIR || type == Material.VOID_AIR;
     }
 }
