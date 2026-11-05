@@ -1,5 +1,5 @@
 name: EasyDomaniNonTiSvegli
-main: xyz.lorenzzzz.easydomani.EasyDomaniNonTiSvegli
+main: xyz.lorenzzzz.easydomani.bootstrap.EasyDomaniNonTiSvegli
 version: '${version}'
 api-version: '1.21'
 author: lorenzzzz

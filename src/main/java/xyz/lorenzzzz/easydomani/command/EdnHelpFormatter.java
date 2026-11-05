@@ -9,18 +9,19 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.CommandSender;
-import xyz.lorenzzzz.easydomani.EasyDomaniNonTiSvegli;
+import xyz.lorenzzzz.easydomani.message.service.MessageService;
 
-/** Lista comandi di /edn: righe da messages.yml (help.*), hover e click per i player. */
 public final class EdnHelpFormatter extends CommandHelpFormatter {
-    // tutti i sottocomandi richiedono questo permesso (ACF mostra gia' solo quelli eseguibili)
+
     private static final String PERMISSION = "edn.admin";
 
-    private final EasyDomaniNonTiSvegli plugin;
+    private final MessageService messages;
+    private final String version;
 
-    public EdnHelpFormatter(PaperCommandManager manager, EasyDomaniNonTiSvegli plugin) {
+    public EdnHelpFormatter(PaperCommandManager manager, MessageService messages, String version) {
         super(manager);
-        this.plugin = plugin;
+        this.messages = messages;
+        this.version = version;
     }
 
     private static CommandSender sender(CommandIssuer issuer) {
@@ -28,13 +29,13 @@ public final class EdnHelpFormatter extends CommandHelpFormatter {
     }
 
     private String[] pageKv(CommandHelp help) {
-        return new String[]{"version", plugin.getPluginMeta().getVersion(),
+        return new String[]{"version", version,
                 "page", String.valueOf(help.getPage()), "pages", String.valueOf(help.getTotalPages())};
     }
 
     @Override
     public void printHelpHeader(CommandHelp help, CommandIssuer issuer) {
-        plugin.lines("help.header", pageKv(help)).forEach(sender(issuer)::sendMessage);
+        messages.lines("help.header", pageKv(help)).forEach(sender(issuer)::sendMessage);
     }
 
     @Override
@@ -43,9 +44,9 @@ public final class EdnHelpFormatter extends CommandHelpFormatter {
         String syntax = entry.getParameterSyntax(issuer), desc = entry.getDescription();
         String[] kv = {"command", command, "syntax", syntax == null ? "" : syntax,
                 "description", desc == null ? "" : desc, "permission", PERMISSION};
-        Component line = plugin.msg("help.command", kv);
+        Component line = messages.msg("help.command", kv);
         if (issuer.isPlayer()) {
-            line = line.hoverEvent(HoverEvent.showText(plugin.msg("help.hover", kv)))
+            line = line.hoverEvent(HoverEvent.showText(messages.msg("help.hover", kv)))
                     .clickEvent(ClickEvent.suggestCommand("/" + command + " "));
         }
         sender(issuer).sendMessage(line);
@@ -56,7 +57,7 @@ public final class EdnHelpFormatter extends CommandHelpFormatter {
         if (help.getTotalPages() <= 1) return;
         String[] kv = pageKv(help);
         CommandSender sender = sender(issuer);
-        sender.sendMessage(plugin.msg("help.footer", kv));
-        sender.sendMessage(plugin.msg("help.footer-more", kv));
+        sender.sendMessage(messages.msg("help.footer", kv));
+        sender.sendMessage(messages.msg("help.footer-more", kv));
     }
 }
