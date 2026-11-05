@@ -27,6 +27,15 @@ class SignProbeResponseClassifierTest {
     }
 
     @Test
+    void keybindRispostaNonPlausibile() {
+        assertEquals(MATCH, SignProbeResponseClassifier.classify(KB, S, "Right Shift", true));
+        assertEquals(MATCH, SignProbeResponseClassifier.classify(KB, S, "x".repeat(32), true));
+        assertEquals(UNKNOWN, SignProbeResponseClassifier.classify(KB, S, "x".repeat(33), true));
+        assertEquals(UNKNOWN, SignProbeResponseClassifier.classify(KB, S, "pre key.anubis.open_gui", true));
+        assertEquals(TAMPERED, SignProbeResponseClassifier.classify(KB, S, "x".repeat(33), false));
+    }
+
+    @Test
     void traduzioneNotaMatch() {
         assertEquals(MATCH, SignProbeResponseClassifier.classify(ANUBIS, S, "Open Anubis", true));
         assertEquals(MATCH, SignProbeResponseClassifier.classify(ANUBIS, S, "§aOpen Anubis ", true));

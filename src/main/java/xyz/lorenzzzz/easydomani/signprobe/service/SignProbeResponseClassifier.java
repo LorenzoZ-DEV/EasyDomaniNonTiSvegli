@@ -6,6 +6,7 @@ import xyz.lorenzzzz.easydomani.detection.model.ModProfile;
 import xyz.lorenzzzz.easydomani.signprobe.model.SignProbeResult;
 
 final class SignProbeResponseClassifier {
+    private static final int MAX_KEY_NAME_LENGTH = 32;
     private static final Pattern COLOR = Pattern.compile("(?i)&[0-9A-FK-OR]|§[0-9A-FK-OR]");
 
     private SignProbeResponseClassifier() {
@@ -19,7 +20,10 @@ final class SignProbeResponseClassifier {
 
         if (norm.equals(key) || (norm.startsWith("{") && norm.contains(key))) return SignProbeResult.NO_MATCH;
         if (sentinel != null && norm.equals(sentinel.toLowerCase(Locale.ROOT))) return SignProbeResult.NO_MATCH;
-        if (def.probeKeybind()) return intact ? SignProbeResult.MATCH : SignProbeResult.TAMPERED;
+        if (def.probeKeybind()) {
+            if (!intact) return SignProbeResult.TAMPERED;
+            return !norm.contains(key) && norm.length() <= MAX_KEY_NAME_LENGTH ? SignProbeResult.MATCH : SignProbeResult.UNKNOWN;
+        }
         if (def.probeExpected().contains(norm)) return SignProbeResult.MATCH;
         return intact ? SignProbeResult.UNKNOWN : SignProbeResult.TAMPERED;
     }

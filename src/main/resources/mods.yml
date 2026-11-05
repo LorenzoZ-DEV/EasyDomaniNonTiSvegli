@@ -14,8 +14,8 @@
 #     bypass:   true = {"translate":"%s","with":[{"translate":key}]} per
 #               superare i mixin che filtrano le key note (es. Meteor)
 #     keybind:  true = invia {"keybind":key}: risolto dal registro KeyMapping del
-#               client, non dipende dalle lang (Lunar); MATCH = qualsiasi risposta
-#               diversa dalla key; `expected` non serve
+#               client, non dipende dalle lang (Lunar); MATCH = risposta che non
+#               contiene la key e lunga al massimo 32 caratteri; `expected` non serve
 #     enabled:  false = key non verificata, probe non usato
 #
 # Ordine = priorita' del probe: prima i cheat (BAN), poi le minimap (ALERT).
