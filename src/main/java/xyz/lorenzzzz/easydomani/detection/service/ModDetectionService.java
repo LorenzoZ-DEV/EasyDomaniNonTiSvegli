@@ -89,10 +89,18 @@ public final class ModDetectionService {
             messages.notifyStaff(messages.msg("mod-detected", "mod", profile.name(), "player", player.getName(), "source", source));
             logger.info("Rilevato " + profile.name() + " su " + player.getName() + " (" + source + ")");
         }
-        if (profile.ban() && punishments.isEnabled() && !player.hasPermission("edn.bypass") && punished.add(uuid)) {
-            punishments.punish(uuid, player.getName(), profile.name());
+        if (profile.ban() && punishments.isEnabled() && !player.hasPermission("edn.bypass")) {
+            punishOnce(uuid, player.getName(), profile.name());
         }
         return profile.ban();
+    }
+
+    boolean punishOnce(UUID uuid, String name, String mod) {
+        if (!punished.add(uuid)) return false;
+        punishments.punish(uuid, name, mod).whenComplete((ignored, error) -> {
+            if (error != null) punished.remove(uuid);
+        });
+        return true;
     }
 
     private void sendJoinInfo(Player player, String brand, int channelCount) {

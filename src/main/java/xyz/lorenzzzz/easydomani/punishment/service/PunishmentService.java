@@ -121,8 +121,8 @@ public final class PunishmentService {
         });
     }
 
-    public void punish(UUID uuid, String name, String mod) {
-        async(() -> recordOffense(uuid, name, mod))
+    public CompletableFuture<Void> punish(UUID uuid, String name, String mod) {
+        return async(() -> recordOffense(uuid, name, mod))
                 .thenAcceptAsync(e -> applyBan(uuid, name, mod, e.count()), mainExecutor)
                 .whenComplete((v, err) -> {
                     if (err != null) logger.log(Level.SEVERE, "Ban non applicato a " + name + " (" + mod + ")", err);
