@@ -55,6 +55,7 @@ public final class SignProbeService {
         boolean packSent;
         volatile ActiveSignProbe active;
         volatile ActiveSignProbe late;
+        private ActiveSignProbe claimed;
 
         Session(List<ModProfile> table) {
             queue.addAll(table);
@@ -69,6 +70,12 @@ public final class SignProbeService {
 
         void retry(ModProfile def) {
             if (retried.add(def.id())) queue.addLast(def);
+        }
+
+        synchronized boolean claimResponse(ActiveSignProbe a) {
+            if (active != a || claimed == a) return false;
+            claimed = a;
+            return true;
         }
 
         boolean abandonActive() {
@@ -130,7 +137,7 @@ public final class SignProbeService {
         ActiveSignProbe a = s.active;
         ActiveSignProbe late = s.late;
         if (a != null && a.pos().equals(pos)) {
-            mainExecutor.execute(() -> handleResponse(uuid, s, a, lines));
+            if (s.claimResponse(a)) mainExecutor.execute(() -> handleResponse(uuid, s, a, lines));
             return true;
         }
         return late != null && late.pos().equals(pos) && System.currentTimeMillis() < late.lateUntil();

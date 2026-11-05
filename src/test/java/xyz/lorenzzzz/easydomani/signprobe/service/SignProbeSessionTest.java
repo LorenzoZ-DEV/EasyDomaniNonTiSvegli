@@ -50,6 +50,23 @@ class SignProbeSessionTest {
         assertTrue(session.queue.isEmpty());
     }
 
+    @Test
+    void floodDiUpdateSignGestisceUnaSolaRisposta() {
+        SignProbeService.Session session = new SignProbeService.Session(List.of());
+        ActiveSignProbe probe = probe(FIRST_PENDING);
+        session.active = probe;
+
+        assertTrue(session.claimResponse(probe));
+        assertFalse(session.claimResponse(probe));
+        assertFalse(session.claimResponse(probe));
+        assertSame(probe, session.active);
+
+        ActiveSignProbe nextProbe = probe(SECOND_PENDING);
+        session.active = nextProbe;
+        assertFalse(session.claimResponse(probe));
+        assertTrue(session.claimResponse(nextProbe));
+    }
+
     private static ActiveSignProbe probe(ModProfile... defs) {
         return new ActiveSignProbe(1L, new Vector3i(0, 64, 0), 0, "edn-test", List.of(defs), Long.MAX_VALUE);
     }
