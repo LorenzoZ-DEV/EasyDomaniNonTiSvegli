@@ -26,7 +26,7 @@ public final class ClientIdentityReader {
     }
 
     public static boolean isLikelyBedrock(Player player) {
-        return player.getUniqueId().getMostSignificantBits() == 0 || brand(player).equalsIgnoreCase("geyser");
+        return player.getUniqueId().getMostSignificantBits() == 0L;
     }
 
     static String sanitize(String raw, int max) {
