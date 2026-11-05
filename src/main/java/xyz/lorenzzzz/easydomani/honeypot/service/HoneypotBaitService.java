@@ -1,6 +1,7 @@
 package xyz.lorenzzzz.easydomani.honeypot.service;
 
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -137,7 +138,7 @@ public final class HoneypotBaitService {
     }
 
     private void placeBait(Player p, UUID uuid, Map<Long, HoneypotBait> map, long now, HoneypotSettings cfg) {
-        Block host = findTarget(scratch, map, cfg);
+        Block host = findTarget(scratch, baits.values(), cfg);
         if (host == null) return;
         HoneypotBaitBlock bait = host.getType() == Material.DEEPSLATE ? baitDeepslate : baitStone;
         if (map == null) map = baits.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());
@@ -168,7 +169,7 @@ public final class HoneypotBaitService {
         return eyeY <= cfg.maxY() && w.getBlockAt(loc.getBlockX(), eyeY, loc.getBlockZ()).getLightFromSky() == 0;
     }
 
-    private static Block findTarget(Location loc, Map<Long, HoneypotBait> existing, HoneypotSettings cfg) {
+    private static Block findTarget(Location loc, Collection<Map<Long, HoneypotBait>> existing, HoneypotSettings cfg) {
         World w = loc.getWorld();
         ThreadLocalRandom r = ThreadLocalRandom.current();
         int minRadius = cfg.minRadius(), maxRadius = cfg.maxRadius();
@@ -187,11 +188,13 @@ public final class HoneypotBaitService {
         return null;
     }
 
-    static boolean touchesBait(Map<Long, ?> existing, int x, int y, int z) {
-        if (existing == null) return false;
-        if (existing.containsKey(BlockPositionKey.pack(x, y, z))) return true;
-        for (BlockFace f : FACES) {
-            if (existing.containsKey(BlockPositionKey.pack(x + f.getModX(), y + f.getModY(), z + f.getModZ()))) return true;
+    static boolean touchesBait(Collection<? extends Map<Long, ?>> allBaits, int x, int y, int z) {
+        if (allBaits == null) return false;
+        for (Map<Long, ?> playerBaits : allBaits) {
+            if (playerBaits.containsKey(BlockPositionKey.pack(x, y, z))) return true;
+            for (BlockFace f : FACES) {
+                if (playerBaits.containsKey(BlockPositionKey.pack(x + f.getModX(), y + f.getModY(), z + f.getModZ()))) return true;
+            }
         }
         return false;
     }
