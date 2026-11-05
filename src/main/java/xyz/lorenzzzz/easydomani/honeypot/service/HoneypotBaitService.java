@@ -179,12 +179,21 @@ public final class HoneypotBaitService {
             if (d2 < min2 || d2 > max2) continue;
             int x = loc.getBlockX() + dx, y = loc.getBlockY() + r.nextInt(-6, 7), z = loc.getBlockZ() + dz;
             if (y <= w.getMinHeight() || y >= w.getMaxHeight() - 1 || !w.isChunkLoaded(x >> 4, z >> 4)) continue;
-            if (existing != null && existing.containsKey(BlockPositionKey.pack(x, y, z))) continue;
+            if (touchesBait(existing, x, y, z)) continue;
             Block b = w.getBlockAt(x, y, z);
             Material t = b.getType();
             if ((t == Material.STONE || t == Material.DEEPSLATE) && enclosed(b)) return b;
         }
         return null;
+    }
+
+    static boolean touchesBait(Map<Long, ?> existing, int x, int y, int z) {
+        if (existing == null) return false;
+        if (existing.containsKey(BlockPositionKey.pack(x, y, z))) return true;
+        for (BlockFace f : FACES) {
+            if (existing.containsKey(BlockPositionKey.pack(x + f.getModX(), y + f.getModY(), z + f.getModZ()))) return true;
+        }
+        return false;
     }
 
     private static boolean enclosed(Block b) {
