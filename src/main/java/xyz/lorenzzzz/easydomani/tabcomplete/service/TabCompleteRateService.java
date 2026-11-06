@@ -26,18 +26,18 @@ public final class TabCompleteRateService {
         return settings;
     }
 
-    public boolean record(UUID uuid) {
+    public int record(UUID uuid) {
         TabCompleteRateSettings s = settings;
         long now = clock.getAsLong();
-        boolean[] over = new boolean[1];
+        int[] count = new int[1];
         hits.compute(uuid, (k, q) -> {
             ArrayDeque<Long> d = q != null ? q : new ArrayDeque<>();
             while (!d.isEmpty() && now - d.peekFirst() >= s.windowMs()) d.pollFirst();
             d.addLast(now);
-            over[0] = d.size() > s.maxPackets();
+            count[0] = d.size();
             return d;
         });
-        return over[0] && flagged.add(uuid);
+        return count[0] > s.maxPackets() && flagged.add(uuid) ? count[0] : 0;
     }
 
     public void forget(UUID uuid) {

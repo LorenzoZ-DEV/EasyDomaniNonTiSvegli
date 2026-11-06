@@ -20,43 +20,50 @@ class TabCompleteRateServiceTest {
         service.reload(new TabCompleteRateSettings(true, 1000L, 3, false));
     }
 
-    private boolean burst(UUID u, int n) {
-        boolean any = false;
-        for (int i = 0; i < n; i++) any |= service.record(u);
-        return any;
+    private int burst(UUID u, int n) {
+        int flagged = 0;
+        for (int i = 0; i < n; i++) flagged = Math.max(flagged, service.record(u));
+        return flagged;
     }
 
     @Test
     void sottoSogliaNonScatta() {
-        assertFalse(burst(a, 3));
+        assertEquals(0, burst(a, 3));
     }
 
     @Test
     void oltreSogliaScattaUnaSolaVolta() {
-        assertFalse(burst(a, 3));
-        assertTrue(service.record(a));
-        assertFalse(service.record(a));
-        assertFalse(service.record(a));
+        assertEquals(0, burst(a, 3));
+        assertEquals(4, service.record(a));
+        assertEquals(0, service.record(a));
+        assertEquals(0, service.record(a));
+    }
+
+    @Test
+    void contaIPacchettiRealiNellaFinestra() {
+        assertEquals(0, burst(a, 3));
+        service.reload(new TabCompleteRateSettings(true, 1000L, 1, false));
+        assertEquals(4, service.record(a));
     }
 
     @Test
     void finestraScadutaResetta() {
         burst(a, 3);
         now = 1000;
-        assertFalse(burst(a, 3));
+        assertEquals(0, burst(a, 3));
     }
 
     @Test
     void forgetResetta() {
-        assertTrue(burst(a, 4));
+        assertEquals(4, burst(a, 4));
         service.forget(a);
-        assertFalse(burst(a, 3));
-        assertTrue(service.record(a));
+        assertEquals(0, burst(a, 3));
+        assertEquals(4, service.record(a));
     }
 
     @Test
     void playerIndipendenti() {
-        assertTrue(burst(a, 4));
-        assertFalse(burst(b, 3));
+        assertEquals(4, burst(a, 4));
+        assertEquals(0, burst(b, 3));
     }
 }

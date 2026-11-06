@@ -43,15 +43,16 @@ public final class TabCompletePacketListener extends PacketListenerAbstract {
         TabCompleteRateSettings s = rate.settings();
         User u = event.getUser();
         UUID uuid = u != null ? u.getUUID() : null;
-        if (!s.enabled() || uuid == null || !rate.record(uuid)) return;
-        main.execute(() -> flag(uuid, s));
+        if (!s.enabled() || uuid == null) return;
+        int count = rate.record(uuid);
+        if (count > 0) main.execute(() -> flag(uuid, s, count));
     }
 
-    private void flag(UUID uuid, TabCompleteRateSettings s) {
+    private void flag(UUID uuid, TabCompleteRateSettings s, int count) {
         Player p = Bukkit.getPlayer(uuid);
         if (p == null) return;
         messages.notifyStaff(messages.msg("tab-complete-rate", "player", p.getName(),
-                "count", String.valueOf(s.maxPackets()), "window", String.valueOf(s.windowMs() / 1000)));
+                "count", String.valueOf(count), "window", String.valueOf(s.windowMs() / 1000)));
         detection.report(p, s.experimentalBan() ? BAN : ALERT, "tab-complete-rate", false);
     }
 }

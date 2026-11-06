@@ -33,7 +33,7 @@ join-info: "&8[<#3ddc84>+&8] <#e8e8e8>%player%&8: <#3ddc84>%brand% <#9a9a9a>| <#
 # %player% %mod% %source%
 mod-detected: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha <#ff8c42>%mod% &8[<#ff8c42>%source%&8]"
 # %player% %count% %window% (secondi)
-tab-complete-rate: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha superato <#ff8c42>%count% <#9a9a9a>tab-complete in <#ff8c42>%window%s"
+tab-complete-rate: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha inviato <#ff8c42>%count% <#9a9a9a>tab-complete in <#ff8c42>%window%s"
 # %player% %duration% %count% %mod%
 ban: "%prefix% <#9a9a9a>» <#e63946>Ban <#e8e8e8>%player% <#9a9a9a>per <#ff8c42>%duration% &8[<#ff8c42>#%count%&8] <#9a9a9a>- <#e8e8e8>%mod%"
 # %player% %block% %x% %y% %z% %count%
