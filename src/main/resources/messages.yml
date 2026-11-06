@@ -31,13 +31,15 @@ punish-reset: "%prefix% <#9a9a9a>» <#e8e8e8>Contatore sanzioni di <#4ec5e8>%pla
 # %player% %brand% %channels%
 join-info: "&8[<#3ddc84>+&8] <#e8e8e8>%player%&8: <#3ddc84>%brand% <#9a9a9a>| <#e8e8e8>canali <#3ddc84>%channels%"
 # %player% %mod% %source%
-mod-detected: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha <#ff8c42>%mod% &8[<#ff8c42>%source%&8]"
+mod-detected: "%prefix% <#ff8c42>Mod rilevata <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- <#ff8c42>%mod% &8[<#ff8c42>%source%&8] <#9a9a9a>| Confidenza: <#e63946>alta"
 # %player% %count% %window% (secondi)
-tab-complete-rate: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha inviato <#ff8c42>%count% <#9a9a9a>tab-complete in <#ff8c42>%window%s"
+tab-complete-rate: "%prefix% <#ff8c42>Tab-complete massivo <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- <#ff8c42>%count% <#9a9a9a>pacchetti in <#ff8c42>%window%s <#9a9a9a>| Possibile 67Client, confidenza: <#e63946>alta"
+# %player%
+anti-vanish-suspect: "%prefix% <#ff8c42>AntiVanish sospetto <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>potrebbe usare l'AntiVanish di Anubis <#9a9a9a>| Confidenza: <#ff8c42>media"
 # %player% %duration% %count% %mod%
-ban: "%prefix% <#9a9a9a>» <#e63946>Ban <#e8e8e8>%player% <#9a9a9a>per <#ff8c42>%duration% &8[<#ff8c42>#%count%&8] <#9a9a9a>- <#e8e8e8>%mod%"
+ban: "%prefix% <#e63946>Ban <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- <#ff8c42>%duration% &8[<#ff8c42>#%count%&8] <#9a9a9a>| <#e8e8e8>%mod%"
 # %player% %block% %x% %y% %z% %count%
-honeypot-hit: "%prefix% <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha scavato un honeypot <#ff8c42>%block% &8[<#ff8c42>%x% %y% %z%&8] &8[<#ff8c42>#%count%&8]"
+honeypot-hit: "%prefix% <#ff8c42>Honeypot <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>ha scavato <#ff8c42>%block% &8[<#ff8c42>%x% %y% %z%&8] <#9a9a9a>| Violazioni: <#ff8c42>#%count%"
 
 # ---- /edn info -------------------------------------------------------------
 # %player% %brand% %count% %channels% %mods% %probe% %hits% %punishments%
