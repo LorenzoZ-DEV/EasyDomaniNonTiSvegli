@@ -111,9 +111,10 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         pm.registerEvents(new RotationProbeListener(rotationProbe), this);
         pm.registerEvents(new HoneypotBlockListener(honeypot), this);
         signPackets = registerPackets(new SignProbePacketListener(signProbe));
-        rotationPackets = registerPackets(new RotationProbePacketListener(rotationProbe, new AntiVanishProbeDetector(logger)));
+        AntiVanishProbeDetector antiVanish = new AntiVanishProbeDetector();
+        rotationPackets = registerPackets(new RotationProbePacketListener(rotationProbe, antiVanish, messages, main));
         honeypotPackets = registerPackets(new HoneypotBlockUpdatePacketListener(honeypot));
-        pm.registerEvents(new TabCompleteRateQuitListener(tabRate), this);
+        pm.registerEvents(new TabCompleteRateQuitListener(tabRate, antiVanish), this);
         tabPackets = registerPackets(new TabCompletePacketListener(tabRate, modDetection, messages, main));
         honeypot.start();
         seedPackets = registerPackets(new HashedSeedPacketListener(fakeSeeds));

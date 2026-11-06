@@ -2,11 +2,7 @@ package xyz.lorenzzzz.easydomani.rotationprobe.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class AntiVanishProbeDetectorTest {
@@ -22,30 +18,22 @@ class AntiVanishProbeDetectorTest {
     }
 
     @Test
-    void logPulitoETroncato() {
-        Logger logger = Logger.getAnonymousLogger();
-        logger.setUseParentHandlers(false);
-        List<String> out = new ArrayList<>();
-        logger.addHandler(new Handler() {
-            @Override
-            public void publish(LogRecord r) {
-                out.add(r.getMessage());
-            }
+    void unAlertPerSessione() {
+        AntiVanishProbeDetector d = new AntiVanishProbeDetector();
+        UUID a = UUID.randomUUID(), b = UUID.randomUUID();
+        assertFalse(d.inspect(a, 3, "/msg "));
+        assertFalse(d.inspect(a, 3, null));
+        assertTrue(d.inspect(a, 4, "minecraft:msg "));
+        assertFalse(d.inspect(a, 30001, "x"));
+        assertTrue(d.inspect(b, 30001, "x"));
+    }
 
-            @Override
-            public void flush() {
-            }
-
-            @Override
-            public void close() {
-            }
-        });
-        AntiVanishProbeDetector d = new AntiVanishProbeDetector(logger);
-        d.inspect("Steve", 3, "/msg ");
-        d.inspect("Steve", 3, null);
-        d.inspect("Steve", 4, "minecraft:msg ");
-        d.inspect("Alex", 30001, "§a\u0007" + "x".repeat(120));
-        assertEquals(List.of("[AntiVanish] Steve id=4 text='minecraft:msg '",
-                "[AntiVanish] Alex id=30001 text='a" + "x".repeat(97) + "'"), out);
+    @Test
+    void forgetRiabilita() {
+        AntiVanishProbeDetector d = new AntiVanishProbeDetector();
+        UUID a = UUID.randomUUID();
+        assertTrue(d.inspect(a, 4, "minecraft:msg "));
+        d.forget(a);
+        assertTrue(d.inspect(a, 4, "minecraft:msg "));
     }
 }

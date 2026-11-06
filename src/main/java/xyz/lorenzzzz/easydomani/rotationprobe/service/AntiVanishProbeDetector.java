@@ -1,21 +1,21 @@
 package xyz.lorenzzzz.easydomani.rotationprobe.service;
 
-import java.util.logging.Logger;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class AntiVanishProbeDetector {
     static final String ANTIVANISH_TEXT = "minecraft:msg ";
     static final int ANTIVANISH_MIN_ID = 30000;
 
-    private final Logger logger;
+    private final Set<UUID> alerted = ConcurrentHashMap.newKeySet();
 
-    public AntiVanishProbeDetector(Logger logger) {
-        this.logger = logger;
+    public boolean inspect(UUID uuid, int id, String text) {
+        return text != null && isAntiVanishProbe(id, text) && alerted.add(uuid);
     }
 
-    public void inspect(String name, int id, String text) {
-        if (text == null || !isAntiVanishProbe(id, text)) return;
-        String shown = text.length() > 100 ? text.substring(0, 100) : text;
-        logger.info("[AntiVanish] " + name + " id=" + id + " text='" + shown.replaceAll("[\\p{Cntrl}§]", "") + "'");
+    public void forget(UUID uuid) {
+        alerted.remove(uuid);
     }
 
     static boolean isAntiVanishProbe(int id, String text) {
