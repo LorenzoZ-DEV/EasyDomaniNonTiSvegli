@@ -52,6 +52,6 @@ public final class TabCompletePacketListener extends PacketListenerAbstract {
         if (p == null) return;
         messages.notifyStaff(messages.msg("tab-complete-rate", "player", p.getName(),
                 "count", String.valueOf(s.maxPackets()), "window", String.valueOf(s.windowMs() / 1000)));
-        detection.report(p, s.experimentalBan() ? BAN : ALERT, "tab-complete-rate");
+        detection.report(p, s.experimentalBan() ? BAN : ALERT, "tab-complete-rate", false);
     }
 }

@@ -3,6 +3,7 @@ package xyz.lorenzzzz.easydomani.detection.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.bukkit.entity.Player;
+import xyz.lorenzzzz.easydomani.detection.model.ModProfile;
 import xyz.lorenzzzz.easydomani.message.service.MessageService;
 import xyz.lorenzzzz.easydomani.punishment.config.PunishmentSettings;
 import xyz.lorenzzzz.easydomani.punishment.service.PunishmentService;
@@ -51,6 +54,29 @@ class ModDetectionServiceTest {
 
         assertTrue(detection.isPunished(uuid));
         assertFalse(detection.punishOnce(uuid, "Tizio", "Anubis"));
+    }
+
+    @Test
+    void reportSilenziosoRegistraSenzaAlertStaff() throws Exception {
+        punishments = openPunishments(runnable -> { });
+        ModDetectionService detection = detectionWith(punishments);
+        UUID uuid = UUID.randomUUID();
+        ModProfile profile = new ModProfile("x", "Mod", false, List.of(), List.of(), List.of(), null, List.of(), false, false);
+
+        assertDoesNotThrow(() -> detection.report(onlinePlayer(uuid), profile, "test", false));
+
+        assertEquals(List.of("Mod"), detection.detectedMods(uuid));
+    }
+
+    private static Player onlinePlayer(UUID uuid) {
+        return (Player) Proxy.newProxyInstance(Player.class.getClassLoader(), new Class<?>[]{Player.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "getUniqueId" -> uuid;
+                    case "getName" -> "Tizio";
+                    case "isOnline" -> true;
+                    case "hasPermission" -> false;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
     }
 
     private PunishmentService openPunishments(Executor mainExecutor) throws Exception {

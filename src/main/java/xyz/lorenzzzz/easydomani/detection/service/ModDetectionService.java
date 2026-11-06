@@ -82,11 +82,15 @@ public final class ModDetectionService {
     }
 
     public boolean report(Player player, ModProfile profile, String source) {
+        return report(player, profile, source, true);
+    }
+
+    public boolean report(Player player, ModProfile profile, String source, boolean notifyStaff) {
         UUID uuid = player.getUniqueId();
         if (!player.isOnline()) return profile.ban();
         boolean first = detected.computeIfAbsent(uuid, k -> Collections.synchronizedSet(new LinkedHashSet<>())).add(profile.name());
         if (first) {
-            messages.notifyStaff(messages.msg("mod-detected", "mod", profile.name(), "player", player.getName(), "source", source));
+            if (notifyStaff) messages.notifyStaff(messages.msg("mod-detected", "mod", profile.name(), "player", player.getName(), "source", source));
             logger.info("Rilevato " + profile.name() + " su " + player.getName() + " (" + source + ")");
         }
         if (profile.ban() && punishments.isEnabled() && !player.hasPermission("edn.bypass")) {
