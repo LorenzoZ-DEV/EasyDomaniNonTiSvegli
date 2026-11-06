@@ -192,7 +192,11 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         packProbe.reload(PackProbeSettings.load(section("modDetection.packProbe"), logger));
         rotationProbe.reload(RotationProbeSettings.load(section("modDetection.rotationProbe")));
         tabRate.reload(TabCompleteRateSettings.load(section("modDetection.tabCompleteRate")));
-        packSpoof.reload(PackSpoofSettings.load(section("modDetection.packSpoof")));
+        PackSpoofSettings spoofSettings = PackSpoofSettings.load(section("modDetection.packSpoof"));
+        packSpoof.reload(spoofSettings);
+        if (spoofSettings.enabled() && spoofSettings.behindVelocity()) {
+            logger.info("PackSpoof: behindVelocity attivo, controllo resource pack disattivato per evitare falsi positivi dal proxy");
+        }
         honeypot.reload(HoneypotSettings.load(section("honeypot"), logger));
         fakeSeeds.reload(global.antiSeedCrackerEnabled());
         if (debug) logger.info("Caricati " + profiles.size() + " profili da mods.yml");

@@ -31,6 +31,7 @@ public final class PackSpoofService {
     }
 
     public void accepted(UUID player, UUID pack) {
+        if (settings.behindVelocity()) return;
         if (!flagged.contains(player)) accepted.put(player, new Accepted(pack, clock.getAsLong()));
     }
 

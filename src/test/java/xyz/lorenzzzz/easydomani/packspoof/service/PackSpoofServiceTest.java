@@ -19,7 +19,7 @@ class PackSpoofServiceTest {
     void setUp() {
         now = 1000;
         service = new PackSpoofService(() -> now);
-        service.reload(new PackSpoofSettings(true, 50L, false));
+        service.reload(new PackSpoofSettings(true, 50L, false, false));
     }
 
     @Test
@@ -28,6 +28,15 @@ class PackSpoofServiceTest {
         now += 1;
         assertTrue(service.loaded(a, pack1));
         assertEquals(1L, service.takePending(a));
+        assertEquals(-1L, service.takePending(a));
+    }
+
+    @Test
+    void dietroVelocityNonScatta() {
+        service.reload(new PackSpoofSettings(true, 50L, false, true));
+        service.accepted(a, pack1);
+        now += 1;
+        assertFalse(service.loaded(a, pack1));
         assertEquals(-1L, service.takePending(a));
     }
 
