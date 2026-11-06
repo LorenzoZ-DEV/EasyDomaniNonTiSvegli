@@ -36,6 +36,8 @@ mod-detected: "%prefix% <#ff8c42>Mod rilevata <#9a9a9a>» <#e8e8e8>%player% <#9a
 tab-complete-rate: "%prefix% <#ff8c42>Tab-complete massivo <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- <#ff8c42>%count% <#9a9a9a>pacchetti in <#ff8c42>%window%s <#9a9a9a>| Possibile 67Client, confidenza: <#e63946>alta"
 # %player%
 anti-vanish-suspect: "%prefix% <#ff8c42>AntiVanish sospetto <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>potrebbe usare l'AntiVanish di Anubis <#9a9a9a>| Confidenza: <#ff8c42>media"
+# %player% %ms%
+pack-spoof: "%prefix% <#ff8c42>Resource pack falsificato <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- caricato in <#ff8c42>%ms%ms <#9a9a9a>| Possibile Meteor ServerSpoof, confidenza: <#ff8c42>media"
 # %player% %duration% %count% %mod%
 ban: "%prefix% <#e63946>Ban <#9a9a9a>» <#e8e8e8>%player% <#9a9a9a>- <#ff8c42>%duration% &8[<#ff8c42>#%count%&8] <#9a9a9a>| <#e8e8e8>%mod%"
 # %player% %block% %x% %y% %z% %count%

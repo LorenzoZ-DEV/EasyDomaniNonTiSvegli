@@ -79,6 +79,17 @@ modDetection:
     windowMs: 10000
     maxPackets: 40
     experimentalBan: false
+  # Resource pack falsificato (Meteor ServerSpoof con resource-pack attivo, sopravvive a
+  # ExploitPreventer): ACCEPTED -> SUCCESSFULLY_LOADED in meno di maxMs = alert staff.
+  # Un client vero deve scaricare il pack e ricaricare le risorse (centinaia di ms).
+  # Serve un resource pack inviato dal server. Esclusi Bedrock (Floodgate).
+  # Dietro Velocity mettere enabled: false: al cambio server il proxy risponde da solo
+  # in modo istantaneo se il pack e' gia' applicato (falso positivo).
+  # experimentalBan: true applica anche la punizione, ATTENZIONE ai falsi positivi.
+  packSpoof:
+    enabled: true
+    maxMs: 50
+    experimentalBan: false
 
 # ---- Punizioni (ban a scala) -----------------------------------------------
 # Contatore persistente nel database H2 (punishments.mv.db), gestibile con /edn punish.

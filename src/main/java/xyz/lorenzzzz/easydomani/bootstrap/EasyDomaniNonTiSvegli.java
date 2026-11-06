@@ -45,6 +45,9 @@ import xyz.lorenzzzz.easydomani.rotationprobe.service.AntiVanishProbeDetector;
 import xyz.lorenzzzz.easydomani.rotationprobe.service.RotationProbeService;
 import xyz.lorenzzzz.easydomani.seed.packet.HashedSeedPacketListener;
 import xyz.lorenzzzz.easydomani.seed.service.FakeSeedService;
+import xyz.lorenzzzz.easydomani.packspoof.config.PackSpoofSettings;
+import xyz.lorenzzzz.easydomani.packspoof.packet.PackSpoofPacketListener;
+import xyz.lorenzzzz.easydomani.packspoof.service.PackSpoofService;
 import xyz.lorenzzzz.easydomani.tabcomplete.config.TabCompleteRateSettings;
 import xyz.lorenzzzz.easydomani.tabcomplete.listener.TabCompleteRateQuitListener;
 import xyz.lorenzzzz.easydomani.tabcomplete.packet.TabCompletePacketListener;
@@ -64,12 +67,13 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
     private HoneypotBaitService honeypot;
     private FakeSeedService fakeSeeds;
     private TabCompleteRateService tabRate;
+    private PackSpoofService packSpoof;
     private MessageService messages;
     private ConfigDefaultsMerger defaultsMerger;
     private Executor mainExecutor;
     private volatile boolean debug;
     private PaperCommandManager commands;
-    private PacketListenerCommon signPackets, rotationPackets, honeypotPackets, seedPackets, tabPackets;
+    private PacketListenerCommon signPackets, rotationPackets, honeypotPackets, seedPackets, tabPackets, spoofPackets;
 
     @Override
     public void onEnable() {
@@ -101,6 +105,7 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         honeypot = new HoneypotBaitService(this, logger, messages, debugOn);
         fakeSeeds = new FakeSeedService(logger, debugOn, new SecureRandom());
         tabRate = new TabCompleteRateService(System::currentTimeMillis);
+        packSpoof = new PackSpoofService(System::currentTimeMillis);
         reload();
 
         PluginManager pm = Bukkit.getPluginManager();
@@ -116,6 +121,9 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         honeypotPackets = registerPackets(new HoneypotBlockUpdatePacketListener(honeypot));
         pm.registerEvents(new TabCompleteRateQuitListener(tabRate, antiVanish), this);
         tabPackets = registerPackets(new TabCompletePacketListener(tabRate, modDetection, messages, main));
+        PackSpoofPacketListener spoofListener = new PackSpoofPacketListener(packSpoof, modDetection, messages, main);
+        pm.registerEvents(spoofListener, this);
+        spoofPackets = registerPackets(spoofListener);
         honeypot.start();
         seedPackets = registerPackets(new HashedSeedPacketListener(fakeSeeds));
         registerCommands();
@@ -147,6 +155,8 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        unregisterPackets(spoofPackets);
+        spoofPackets = null;
         unregisterPackets(tabPackets);
         tabPackets = null;
         unregisterPackets(seedPackets);
@@ -182,6 +192,7 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         packProbe.reload(PackProbeSettings.load(section("modDetection.packProbe"), logger));
         rotationProbe.reload(RotationProbeSettings.load(section("modDetection.rotationProbe")));
         tabRate.reload(TabCompleteRateSettings.load(section("modDetection.tabCompleteRate")));
+        packSpoof.reload(PackSpoofSettings.load(section("modDetection.packSpoof")));
         honeypot.reload(HoneypotSettings.load(section("honeypot"), logger));
         fakeSeeds.reload(global.antiSeedCrackerEnabled());
         if (debug) logger.info("Caricati " + profiles.size() + " profili da mods.yml");
