@@ -45,6 +45,10 @@ import xyz.lorenzzzz.easydomani.rotationprobe.service.AntiVanishProbeDetector;
 import xyz.lorenzzzz.easydomani.rotationprobe.service.RotationProbeService;
 import xyz.lorenzzzz.easydomani.seed.packet.HashedSeedPacketListener;
 import xyz.lorenzzzz.easydomani.seed.service.FakeSeedService;
+import xyz.lorenzzzz.easydomani.tabcomplete.config.TabCompleteRateSettings;
+import xyz.lorenzzzz.easydomani.tabcomplete.listener.TabCompleteRateQuitListener;
+import xyz.lorenzzzz.easydomani.tabcomplete.packet.TabCompletePacketListener;
+import xyz.lorenzzzz.easydomani.tabcomplete.service.TabCompleteRateService;
 import xyz.lorenzzzz.easydomani.signprobe.config.SignProbeSettings;
 import xyz.lorenzzzz.easydomani.signprobe.listener.SignProbeListener;
 import xyz.lorenzzzz.easydomani.signprobe.packet.SignEditorPackets;
@@ -59,12 +63,13 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
     private RotationProbeService rotationProbe;
     private HoneypotBaitService honeypot;
     private FakeSeedService fakeSeeds;
+    private TabCompleteRateService tabRate;
     private MessageService messages;
     private ConfigDefaultsMerger defaultsMerger;
     private Executor mainExecutor;
     private volatile boolean debug;
     private PaperCommandManager commands;
-    private PacketListenerCommon signPackets, rotationPackets, honeypotPackets, seedPackets;
+    private PacketListenerCommon signPackets, rotationPackets, honeypotPackets, seedPackets, tabPackets;
 
     @Override
     public void onEnable() {
@@ -95,6 +100,7 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         rotationProbe = new RotationProbeService(this, logger, main, debugOn, uuid -> sign.busy(uuid) || pack.isPending(uuid));
         honeypot = new HoneypotBaitService(this, logger, messages, debugOn);
         fakeSeeds = new FakeSeedService(logger, debugOn, new SecureRandom());
+        tabRate = new TabCompleteRateService(System::currentTimeMillis);
         reload();
 
         PluginManager pm = Bukkit.getPluginManager();
@@ -107,6 +113,8 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         signPackets = registerPackets(new SignProbePacketListener(signProbe));
         rotationPackets = registerPackets(new RotationProbePacketListener(rotationProbe, new AntiVanishProbeDetector(logger)));
         honeypotPackets = registerPackets(new HoneypotBlockUpdatePacketListener(honeypot));
+        pm.registerEvents(new TabCompleteRateQuitListener(tabRate), this);
+        tabPackets = registerPackets(new TabCompletePacketListener(tabRate, modDetection, messages, main));
         honeypot.start();
         seedPackets = registerPackets(new HashedSeedPacketListener(fakeSeeds));
         registerCommands();
@@ -138,6 +146,8 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        unregisterPackets(tabPackets);
+        tabPackets = null;
         unregisterPackets(seedPackets);
         seedPackets = null;
         unregisterPackets(honeypotPackets);
@@ -170,6 +180,7 @@ public final class EasyDomaniNonTiSvegli extends JavaPlugin {
         signProbe.reload(SignProbeSettings.load(section("modDetection.probe")), profiles);
         packProbe.reload(PackProbeSettings.load(section("modDetection.packProbe"), logger));
         rotationProbe.reload(RotationProbeSettings.load(section("modDetection.rotationProbe")));
+        tabRate.reload(TabCompleteRateSettings.load(section("modDetection.tabCompleteRate")));
         honeypot.reload(HoneypotSettings.load(section("honeypot"), logger));
         fakeSeeds.reload(global.antiSeedCrackerEnabled());
         if (debug) logger.info("Caricati " + profiles.size() + " profili da mods.yml");

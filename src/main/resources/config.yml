@@ -71,6 +71,14 @@ modDetection:
     enabled: false
     # Attesa dopo il join (tick).
     delayTicks: 200
+  # Tab-complete massivo (segnale comportamentale di 67Client AntiVanish): piu' di maxPackets
+  # pacchetti in windowMs = alert staff. experimentalBan: true applica anche la punizione,
+  # ATTENZIONE: puo' dare falsi positivi (macro, client con autocompletamento aggressivo).
+  tabCompleteRate:
+    enabled: true
+    windowMs: 10000
+    maxPackets: 40
+    experimentalBan: false
 
 # ---- Punizioni (ban a scala) -----------------------------------------------
 # Contatore persistente nel database H2 (punishments.mv.db), gestibile con /edn punish.
